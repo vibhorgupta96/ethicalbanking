@@ -38,7 +38,7 @@ export default function LoginScreen() {
         <ul className="list-disc space-y-2 pl-6 text-sm text-slate-600">
           <li>Simulated consent ledger backed by SHA-256 hashes</li>
           <li>Explainable AI (SHAP) feed via Python microservice</li>
-          <li>Gemini powered transparency explanations</li>
+          <li>Hugging Face (Mistral-7B-Instruct-v0.2) transparency explanations</li>
         </ul>
       </Card>
     </div>

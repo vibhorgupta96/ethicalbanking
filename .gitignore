@@ -40,3 +40,13 @@ frontend/dist/
 ai-service/.venv/
 ai-service/__pycache__/
 ai-service/.pytest_cache/
+
+# Local environment secrets
+.env
+.env.local
+.env.development
+.env.production
+*.env
+!.env.example
+gateway-service/.env
+ai-service/.env

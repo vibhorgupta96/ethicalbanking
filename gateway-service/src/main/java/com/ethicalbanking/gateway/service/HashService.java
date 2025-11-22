@@ -3,10 +3,14 @@ package com.ethicalbanking.gateway.service;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 @Service
 public class HashService {
+
+	private static final Logger log = LoggerFactory.getLogger(HashService.class);
 
 	public String sha256(String payload) {
 		try {
@@ -19,6 +23,7 @@ public class HashService {
 			return builder.toString();
 		}
 		catch (NoSuchAlgorithmException ex) {
+			log.error("SHA-256 algorithm unavailable", ex);
 			throw new IllegalStateException("SHA-256 not available", ex);
 		}
 	}

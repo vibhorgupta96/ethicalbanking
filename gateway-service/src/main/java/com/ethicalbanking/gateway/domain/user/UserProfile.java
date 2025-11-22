@@ -27,6 +27,12 @@ public class UserProfile {
 	@Column(nullable = false)
 	private Integer creditScore;
 
+	@Column(nullable = false)
+	private Integer netMonthlyIncome;
+
+	@Column(nullable = false)
+	private String segment;
+
 	public Long getId() {
 		return id;
 	}
@@ -61,6 +67,22 @@ public class UserProfile {
 
 	public void setCreditScore(Integer creditScore) {
 		this.creditScore = creditScore;
+	}
+
+	public Integer getNetMonthlyIncome() {
+		return netMonthlyIncome;
+	}
+
+	public void setNetMonthlyIncome(Integer netMonthlyIncome) {
+		this.netMonthlyIncome = netMonthlyIncome;
+	}
+
+	public String getSegment() {
+		return segment;
+	}
+
+	public void setSegment(String segment) {
+		this.segment = segment;
 	}
 }
 
