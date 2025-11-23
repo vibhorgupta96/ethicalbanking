@@ -25,6 +25,9 @@ export const Api = {
   },
   getFairGuardSummary() {
     return client.get('/fairguard/summary');
+  },
+  simulateFairGuard() {
+    return client.post('/fairguard/simulate');
   }
 };
 

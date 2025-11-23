@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { User, KeyRound, LogIn, Shield, Cpu, Lock, ShieldCheck } from 'lucide-react';
 import { Card } from '../components/common/Card';
 import { Api } from '../lib/api';
 
@@ -52,54 +53,112 @@ export default function LoginScreen({ onLogin = () => {} }) {
   };
 
   return (
-    <div className="grid gap-6 md:grid-cols-2">
-      <Card
-        title="Welcome to Ethical Banking"
-        subtitle="Authenticate to access AskAI and TrustVault insights."
-      >
-        <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
-          <label className="flex flex-col gap-2 text-sm font-medium text-slate-600">
-            User ID
-            <input
-              className="rounded-lg border border-slate-200 px-4 py-2 focus:border-primary focus:outline-none"
-              value={userId}
-              onChange={(event) => setUserId(event.target.value)}
-              placeholder="user_123"
-            />
-          </label>
-          <label className="flex flex-col gap-2 text-sm font-medium text-slate-600">
-            Passphrase
-            <input
-              type="password"
-              className="rounded-lg border border-slate-200 px-4 py-2 focus:border-primary focus:outline-none"
-              value={passphrase}
-              onChange={(event) => setPassphrase(event.target.value)}
-              placeholder="••••••••"
-            />
-          </label>
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className="mt-2 rounded-full bg-primary px-6 py-3 text-sm font-semibold text-white shadow transition hover:bg-secondary disabled:cursor-not-allowed disabled:opacity-70"
-          >
-            {isSubmitting ? 'Signing in…' : 'Sign In'}
-          </button>
-          {error && <p className="text-sm text-red-600">{error}</p>}
-          <p className="text-xs text-slate-500">
-            Tip: demo credentials → user_001 / pass123 (customer) or admin_001 / admin123 (admin).
-          </p>
-        </form>
-      </Card>
-      <Card
-        title="Hackathon Slice"
-        subtitle="Layer 3 experience: AskAI + TrustVault"
-      >
-        <ul className="list-disc space-y-2 pl-6 text-sm text-slate-600">
-          <li>Simulated consent ledger backed by SHA-256 hashes</li>
-          <li>Explainable AI (SHAP) feed via Python microservice</li>
-          <li>Hugging Face (Mistral-7B-Instruct-v0.2) transparency explanations</li>
-        </ul>
-      </Card>
+    <div className="mx-auto max-w-6xl px-4">
+      <div className="grid min-h-[calc(100vh-12rem)] items-center gap-8 lg:grid-cols-2">
+        <div className="flex flex-col justify-center space-y-6">
+          <div>
+            <h2 className="text-3xl font-bold text-slate-900">Welcome back</h2>
+            <p className="mt-2 text-slate-600">Sign in to access your ethical banking dashboard.</p>
+          </div>
+          
+          <Card className="shadow-lg shadow-slate-200/50">
+            <form className="flex flex-col gap-5" onSubmit={handleSubmit}>
+              <label className="flex flex-col gap-2 text-sm font-semibold text-slate-700">
+                User ID
+                <div className="relative group">
+                  <User className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors" />
+                  <input
+                    className="w-full rounded-xl border border-slate-200 bg-slate-50 px-10 py-3 transition-all focus:border-primary focus:bg-white focus:outline-none focus:ring-4 focus:ring-primary/10"
+                    value={userId}
+                    onChange={(event) => setUserId(event.target.value)}
+                    placeholder="e.g. user_123"
+                  />
+                </div>
+              </label>
+              <label className="flex flex-col gap-2 text-sm font-semibold text-slate-700">
+                Password
+                <div className="relative group">
+                  <KeyRound className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors" />
+                  <input
+                    type="password"
+                    className="w-full rounded-xl border border-slate-200 bg-slate-50 px-10 py-3 transition-all focus:border-primary focus:bg-white focus:outline-none focus:ring-4 focus:ring-primary/10"
+                    value={passphrase}
+                    onChange={(event) => setPassphrase(event.target.value)}
+                    placeholder="••••••••"
+                  />
+                </div>
+              </label>
+              
+              {error && (
+                <div className="rounded-lg bg-red-50 p-3 text-sm text-red-600 flex items-center gap-2">
+                  <div className="h-1.5 w-1.5 rounded-full bg-red-600" />
+                  {error}
+                </div>
+              )}
+
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="mt-2 flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-primary to-secondary px-6 py-3.5 text-sm font-bold text-white shadow-lg shadow-primary/25 transition-all hover:shadow-primary/40 hover:translate-y-[-1px] active:translate-y-[0px] disabled:cursor-not-allowed disabled:opacity-70"
+              >
+                {isSubmitting ? (
+                  'Signing in…'
+                ) : (
+                  <>
+                    <LogIn className="h-5 w-5" /> Sign In
+                  </>
+                )}
+              </button>
+            </form>
+          </Card>
+        </div>
+
+        <div className="flex flex-col justify-center space-y-6 lg:pl-10">
+          <div>
+            <h3 className="text-xl font-bold text-slate-900">Latest Features</h3>
+            <p className="mt-1 text-slate-500">What's new in Ethical Banking</p>
+          </div>
+          
+          <div className="grid gap-4">
+            {[
+              {
+                icon: Lock,
+                color: 'indigo',
+                title: 'Consent Ledger',
+                desc: 'Simulated consent ledger backed by SHA-256 hashes'
+              },
+              {
+                icon: Cpu,
+                color: 'emerald',
+                title: 'Explainable AI',
+                desc: 'SHAP feed via Python microservice'
+              },
+              {
+                icon: Shield,
+                color: 'amber',
+                title: 'Transparency',
+                desc: 'LLM transparency explanations'
+              },
+              {
+                icon: ShieldCheck,
+                color: 'rose',
+                title: 'FairGuard',
+                desc: 'Real-time bias detection and automated circuit breakers'
+              }
+            ].map((feature, idx) => (
+              <div key={idx} className="flex items-start gap-4 rounded-2xl border border-slate-100 bg-white p-4 shadow-sm transition-all hover:shadow-md hover:border-slate-200">
+                <div className={`rounded-xl bg-${feature.color}-50 p-3 text-${feature.color}-600`}>
+                  <feature.icon className="h-6 w-6" />
+                </div>
+                <div>
+                  <h4 className="font-semibold text-slate-900">{feature.title}</h4>
+                  <p className="text-sm text-slate-600">{feature.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

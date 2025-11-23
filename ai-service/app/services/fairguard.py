@@ -4,6 +4,7 @@ from collections import Counter, defaultdict, deque
 from datetime import datetime, timezone
 from threading import Lock
 from typing import Any, Dict, List, Optional
+import random
 
 
 class FairGuardMonitor:
@@ -42,6 +43,52 @@ class FairGuardMonitor:
             for attr in self.protected_attributes
         }
         self._shap_counter: Counter[str] = Counter()
+        
+        # Seed initial data for demo purposes
+        # self.seed_simulation_data()
+
+    def seed_simulation_data(self):
+        """
+        Populates the monitor with synthetic data to demonstrate:
+        1. Probability Drift (High -> Low probability)
+        2. Demographic Parity Alert (Gender bias)
+        """
+        half_window = self.window_size // 2
+
+        # Phase 1: Stable period (High probability, balanced approvals)
+        # Fills the first half of the window (the "oldest" events)
+        for _ in range(half_window):
+            gender = random.choice(["M", "F"])
+            prob = random.uniform(0.75, 0.95)
+            # High approval rate for everyone
+            decision = "Approved" if random.random() > 0.1 else "Rejected"
+            
+            payload = {
+                "GENDER": gender,
+                "MARITALSTATUS": random.choice(["Married", "Single"]),
+                "EDUCATION": random.choice(["Graduate", "Undergrad"])
+            }
+            self.record_event(payload, decision, prob)
+
+        # Phase 2: Drift period (Lower probability, biased approvals)
+        # Fills the second half of the window (the "newest" events)
+        for _ in range(half_window):
+            gender = random.choice(["M", "F"])
+            prob = random.uniform(0.35, 0.55)
+            
+            if gender == "M":
+                # Males still get approved often despite lower probability
+                decision = "Approved" if random.random() > 0.3 else "Rejected"
+            else:
+                # Females get rejected almost always
+                decision = "Rejected" if random.random() > 0.1 else "Approved"
+                
+            payload = {
+                "GENDER": gender,
+                "MARITALSTATUS": random.choice(["Married", "Single"]),
+                "EDUCATION": random.choice(["Graduate", "Undergrad"])
+            }
+            self.record_event(payload, decision, prob)
 
     def record_event(
         self,
@@ -172,7 +219,7 @@ class FairGuardMonitor:
 
     def _drift_score_locked(self) -> float:
         total_events = len(self._events)
-        if total_events < 8:
+        if total_events < 5:
             return 0.0
 
         midpoint = total_events // 2
