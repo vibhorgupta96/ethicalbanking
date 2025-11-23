@@ -48,6 +48,18 @@ public class FairGuardService {
 		}
 	}
 
+	public FairGuardSummaryResponse triggerSimulation() {
+		lock.lock();
+		try {
+			// Trigger simulation and update cache immediately
+			cachedSummary = client.triggerSimulation();
+			cacheExpiry = Instant.now().plus(CACHE_TTL);
+			return cachedSummary;
+		} finally {
+			lock.unlock();
+		}
+	}
+
 	public void evictCache() {
 		lock.lock();
 		try {

@@ -49,5 +49,24 @@ public class FairGuardClient {
 			throw new ExternalServiceException("AI FairGuard", "FairGuard endpoint is unavailable", ex);
 		}
 	}
+
+	public FairGuardSummaryResponse triggerSimulation() {
+		try {
+			log.info("Triggering FairGuardAI simulation on AI backend");
+			return aiWebClient.post()
+					.uri("/monitor/fairguard/simulate")
+					.contentType(MediaType.APPLICATION_JSON)
+					.accept(MediaType.APPLICATION_JSON)
+					.retrieve()
+					.bodyToMono(FairGuardSummaryResponse.class)
+					.timeout(Duration.ofSeconds(10))
+					.blockOptional()
+					.orElseThrow(() -> new ExternalServiceException("AI FairGuard",
+							"AI backend did not return a summary after simulation."));
+		} catch (Exception ex) {
+			log.error("FairGuard simulation request failed", ex);
+			throw new ExternalServiceException("AI FairGuard", "Simulation trigger failed", ex);
+		}
+	}
 }
 

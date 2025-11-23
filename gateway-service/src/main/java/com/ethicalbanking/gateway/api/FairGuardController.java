@@ -26,5 +26,11 @@ public class FairGuardController {
 		log.info("Fetching FairGuard governance summary");
 		return ResponseEntity.ok(fairGuardService.fetchSummary());
 	}
+
+	@org.springframework.web.bind.annotation.PostMapping("/simulate")
+	public ResponseEntity<FairGuardSummaryResponse> triggerSimulation() {
+		log.info("Triggering FairGuard simulation via API");
+		return ResponseEntity.ok(fairGuardService.triggerSimulation());
+	}
 }
 

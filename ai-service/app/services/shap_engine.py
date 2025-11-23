@@ -56,12 +56,52 @@ class ShapEngine:
 
         feature_names = self.preprocessor.get_feature_names_out()
         contributions = [
-            (name, float(value)) for name, value in zip(feature_names, shap_vector)
+            (self._prettify_name(name), float(value)) for name, value in zip(feature_names, shap_vector)
         ]
         contributions.sort(key=lambda item: abs(item[1]), reverse=True)
         if top_n:
             contributions = contributions[:top_n]
         return dict(contributions)
+
+    def _prettify_name(self, name: str) -> str:
+        # Remove standard pipeline prefixes
+        clean = name.replace("cat__", "").replace("num__", "")
+        
+        mapping = {
+            "MARITALSTATUS": "Marital Status",
+            "EDUCATION": "Education",
+            "GENDER": "Gender",
+            "CC_Flag": "Credit Card Holder",
+            "PL_Flag": "Personal Loan Holder",
+            "HL_Flag": "Home Loan Holder",
+            "GL_Flag": "Gold Loan Holder",
+            "last_prod_enq2": "Recent Product Inquiry",
+            "first_prod_enq2": "First Product Inquiry",
+            "AGE": "Age",
+            "NETMONTHLYINCOME": "Net Monthly Income",
+            "Credit_Score": "Credit Score",
+            "num_times_delinquent": "Times Delinquent",
+            "num_times_60p_dpd": "Times 60+ DPD",
+            "num_std": "Standard Accounts",
+            "num_sub": "Substandard Accounts",
+            "num_dbt": "Doubtful Accounts",
+            "CC_utilization": "Credit Card Utilization",
+            "PL_utilization": "Personal Loan Utilization",
+            "time_since_recent_payment": "Time Since Recent Payment",
+            "time_since_recent_enq": "Time Since Recent Inquiry",
+        }
+
+        for key, label in mapping.items():
+            if clean.startswith(key):
+                if clean == key:
+                    return label
+                # Handle one-hot encoded suffixes (e.g. GENDER_F)
+                if clean.startswith(key + "_"):
+                    suffix = clean[len(key) + 1:]
+                    return f"{label}: {suffix}"
+        
+        # Fallback cleanup
+        return clean.replace("_", " ").title()
 
     @property
     def base_value(self) -> Optional[float]:

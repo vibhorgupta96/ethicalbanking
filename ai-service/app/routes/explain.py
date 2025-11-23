@@ -33,5 +33,12 @@ def create_blueprint(shap_engine, pipeline, fairguard_monitor):
     def fairguard_summary():
         return jsonify(fairguard_monitor.summary())
 
+    @blueprint.post("/monitor/fairguard/simulate")
+    def trigger_simulation():
+        # In case the browser sends an options preflight or empty body, we handle it gracefully.
+        # The simulation doesn't actually need a body.
+        fairguard_monitor.seed_simulation_data()
+        return jsonify(fairguard_monitor.summary())
+
     return blueprint
 
