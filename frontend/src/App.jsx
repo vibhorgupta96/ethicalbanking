@@ -4,15 +4,18 @@ import LoginScreen from './screens/LoginScreen';
 import DecisionScreen from './screens/DecisionScreen';
 import TrustVaultScreen from './screens/TrustVaultScreen';
 import AskAiScreen from './screens/AskAiScreen';
+import FairGuardScreen from './screens/FairGuardScreen';
 
 const viewConfig = [
   { id: 'decision', label: 'XBox', roles: ['admin'] },
+  { id: 'fairguard', label: 'FairGuard', roles: ['admin'] },
   { id: 'trustvault', label: 'TrustVault', roles: ['customer'] },
   { id: 'askai', label: 'AskAI', roles: ['admin', 'customer'] }
 ];
 
 const screenMap = {
   decision: DecisionScreen,
+  fairguard: FairGuardScreen,
   trustvault: TrustVaultScreen,
   askai: AskAiScreen
 };

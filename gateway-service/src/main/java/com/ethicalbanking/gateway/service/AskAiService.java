@@ -45,6 +45,14 @@ public class AskAiService {
 		AskAiResponse response = new AskAiResponse();
 		response.setShapValues((Map<String, Object>) aiResponse.getOrDefault("shap_values", Map.of()));
 		response.setDecisionSummary((String) aiResponse.getOrDefault("decision", "undetermined"));
+		Map<String, Object> fairGuardStatus = (Map<String, Object>) aiResponse.getOrDefault("fairguard", Map.of());
+		if (Boolean.TRUE.equals(fairGuardStatus.get("circuitBreakerActive"))) {
+			String reason = (String) fairGuardStatus.getOrDefault("reason", "Bias guardrail triggered.");
+			log.warn("FairGuardAI circuit breaker active for user {}: {}", safeRequest.getUserId(), reason);
+			throw new IllegalStateException(
+					"FairGuardAI intercepted this decision: %s".formatted(reason));
+		}
+		response.setFairGuard(fairGuardStatus);
 		response.setExplanation(
 				huggingFaceService.craftExplanation(response.getDecisionSummary(), response.getShapValues()));
 		log.info("Completed Ask AI request for user {} with decision {}", safeRequest.getUserId(),

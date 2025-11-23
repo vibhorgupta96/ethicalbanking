@@ -9,3 +9,35 @@
   opacity: 0.2;
   margin: 1.5rem 0;
 }
+
+/* Styles for sanitized AskAI HTML output */
+.askai-response {
+  line-height: 1.6;
+}
+
+.askai-response :where(p, ul, ol, li) {
+  margin: 0.5rem 0 0;
+}
+
+.askai-response ul,
+.askai-response ol {
+  padding-left: 1.25rem;
+}
+
+.askai-response li {
+  margin-top: 0.25rem;
+}
+
+.askai-response strong {
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.askai-response em {
+  font-style: italic;
+}
+
+.askai-response a {
+  color: #0f766e;
+  text-decoration: underline;
+}

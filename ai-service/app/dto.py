@@ -13,4 +13,5 @@ class ExplainResponse:
     shap_values: Dict[str, float] = field(default_factory=dict)
     base_value: Optional[float] = None
     probability: Optional[float] = None
+    fairguard: Dict[str, Any] = field(default_factory=dict)
 
