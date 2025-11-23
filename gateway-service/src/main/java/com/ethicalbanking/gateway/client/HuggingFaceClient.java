@@ -27,13 +27,16 @@ public class HuggingFaceClient {
 	private final WebClient huggingFaceWebClient;
 	private final ObjectMapper objectMapper;
 	private final String modelId;
+	private final Duration requestTimeout;
 
 	public HuggingFaceClient(@Qualifier("huggingFaceWebClient") WebClient huggingFaceWebClient,
 			ObjectMapper objectMapper,
-			@Value("${huggingface.model:mistralai/Mistral-7B-Instruct-v0.2}") String modelId) {
+			@Value("${huggingface.model:mistralai/Mistral-7B-Instruct-v0.2}") String modelId,
+			@Value("${huggingface.timeout-seconds:45}") long timeoutSeconds) {
 		this.huggingFaceWebClient = huggingFaceWebClient;
 		this.objectMapper = objectMapper;
 		this.modelId = modelId;
+		this.requestTimeout = Duration.ofSeconds(Math.max(5, timeoutSeconds));
 	}
 
 	public String requestExplanation(String systemPrompt, String userPrompt) {
@@ -52,7 +55,7 @@ public class HuggingFaceClient {
 					.bodyValue(payload)
 					.retrieve()
 					.bodyToMono(String.class)
-					.timeout(Duration.ofSeconds(20))
+					.timeout(requestTimeout)
 					.block();
 
 			String generatedText = extractGeneratedText(rawResponse);

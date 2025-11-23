@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
+import DOMPurify from 'dompurify';
 import { Card } from '../components/common/Card';
 import { Api } from '../lib/api';
 
@@ -32,8 +33,13 @@ export default function AskAiScreen() {
   const [decisionSummary, setDecisionSummary] = useState('');
   const [response, setResponse] = useState('Mistral explanation pending submission.');
   const [shapValues, setShapValues] = useState([]);
+  const [fairGuardStatus, setFairGuardStatus] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
+  const sanitizedResponse = useMemo(
+    () => DOMPurify.sanitize(response ?? ''),
+    [response]
+  );
 
   const handleSubmit = async () => {
     if (!question.trim()) {
@@ -46,6 +52,7 @@ export default function AskAiScreen() {
     setDecisionSummary('');
     setResponse('Sending question to the gateway...');
     setShapValues([]);
+    setFairGuardStatus(null);
 
     try {
       await Api.setConsent(DEFAULT_USER_ID, { consentPayload: question });
@@ -60,6 +67,7 @@ export default function AskAiScreen() {
         data?.explanation ??
           'The Hugging Face client responded without an explanation payload.'
       );
+      setFairGuardStatus(data?.fairGuard ?? null);
 
       const sortedShap = Object.entries(data?.shapValues ?? {}).sort(
         (a, b) => Math.abs(b[1]) - Math.abs(a[1])
@@ -73,6 +81,7 @@ export default function AskAiScreen() {
         'Unable to reach the AskAI endpoint.';
       setError(message);
       setResponse('Mistral explanation unavailable.');
+      setFairGuardStatus(null);
     } finally {
       setIsSubmitting(false);
     }
@@ -105,12 +114,49 @@ export default function AskAiScreen() {
           return a deterministic explanation.
         </p>
       </Card>
+      <Card title="FairGuardAI Oversight">
+        {!fairGuardStatus && (
+          <p className="text-sm text-slate-500">
+            Submit a question to view the real-time guardrail response.
+          </p>
+        )}
+        {fairGuardStatus && (
+          <div className="space-y-3 text-sm">
+            <div className="flex flex-wrap items-center gap-3">
+              <span className="text-slate-500">Status</span>
+              <span
+                className={`rounded-full px-3 py-1 text-xs font-semibold ${
+                  fairGuardStatus.status === 'ALERT'
+                    ? 'bg-red-100 text-red-700'
+                    : 'bg-emerald-100 text-emerald-700'
+                }`}
+              >
+                {fairGuardStatus.status}
+              </span>
+            </div>
+            {fairGuardStatus.alerts?.length > 0 ? (
+              <ul className="list-disc space-y-1 pl-5 text-red-600">
+                {fairGuardStatus.alerts.map((alert, index) => (
+                  <li key={`${alert}-${index}`}>{alert}</li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-slate-600">
+                All guardrails are within tolerance. This decision can be auto-released.
+              </p>
+            )}
+          </div>
+        )}
+      </Card>
       <Card title="LLM Response Preview">
         {error && <p className="text-sm text-red-600">{error}</p>}
         {decisionSummary && (
           <p className="text-sm font-semibold text-slate-800">{decisionSummary}</p>
         )}
-        <p className="text-sm text-slate-700">{response}</p>
+        <div
+          className="askai-response text-sm text-slate-700"
+          dangerouslySetInnerHTML={{ __html: sanitizedResponse }}
+        />
       </Card>
       <Card title="Top SHAP Drivers">
         {shapValues.length === 0 && (

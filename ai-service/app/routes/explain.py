@@ -3,7 +3,7 @@ from flask import Blueprint, jsonify, request
 from ..dto import ExplainResponse
 
 
-def create_blueprint(shap_engine, pipeline):
+def create_blueprint(shap_engine, pipeline, fairguard_monitor):
     blueprint = Blueprint("explain", __name__)
 
     @blueprint.post("/explain")
@@ -22,7 +22,16 @@ def create_blueprint(shap_engine, pipeline):
             probability=probability,
         )
 
-        return jsonify(response.__dict__)
+        fairguard_status = fairguard_monitor.record_event(
+            payload, response.decision, probability, shap_values
+        )
+        envelope = response.__dict__.copy()
+        envelope["fairguard"] = fairguard_status
+        return jsonify(envelope)
+
+    @blueprint.get("/monitor/fairguard")
+    def fairguard_summary():
+        return jsonify(fairguard_monitor.summary())
 
     return blueprint
 

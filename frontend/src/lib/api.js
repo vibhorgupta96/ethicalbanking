@@ -22,6 +22,9 @@ export const Api = {
   },
   getDecisionInsight(userId) {
     return client.get(`/decision/${userId}`);
+  },
+  getFairGuardSummary() {
+    return client.get('/fairguard/summary');
   }
 };
 

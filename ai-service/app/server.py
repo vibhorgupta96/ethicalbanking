@@ -2,6 +2,7 @@ from flask import Flask, jsonify
 
 from .config import settings
 from .routes.explain import create_blueprint
+from .services.fairguard import FairGuardMonitor
 from .services.model_registry import ModelRegistry
 from .services.shap_engine import ShapEngine
 
@@ -16,7 +17,14 @@ def create_app():
     background = artifact.get("background")
 
     shap_engine = ShapEngine(pipeline, feature_columns, background).bootstrap()
-    app.register_blueprint(create_blueprint(shap_engine, pipeline))
+    fairguard_monitor = FairGuardMonitor(
+        parity_threshold=settings.fairguard_parity_threshold,
+        drift_threshold=settings.fairguard_drift_threshold,
+        window_size=settings.fairguard_window_size,
+    )
+    app.register_blueprint(
+        create_blueprint(shap_engine, pipeline, fairguard_monitor)
+    )
 
     @app.get("/health")
     def health():

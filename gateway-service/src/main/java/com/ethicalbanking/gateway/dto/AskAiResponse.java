@@ -7,6 +7,7 @@ public class AskAiResponse {
 	private String decisionSummary;
 	private String explanation;
 	private Map<String, Object> shapValues;
+	private Map<String, Object> fairGuard;
 
 	public String getDecisionSummary() {
 		return decisionSummary;
@@ -30,6 +31,14 @@ public class AskAiResponse {
 
 	public void setShapValues(Map<String, Object> shapValues) {
 		this.shapValues = shapValues;
+	}
+
+	public Map<String, Object> getFairGuard() {
+		return fairGuard;
+	}
+
+	public void setFairGuard(Map<String, Object> fairGuard) {
+		this.fairGuard = fairGuard;
 	}
 }
 
